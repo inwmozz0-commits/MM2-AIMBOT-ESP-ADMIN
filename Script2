@@ -1,0 +1,405 @@
+-- ============================================
+-- NULLBYTE ONE-BUTTON INJECTOR + MAX VOLUME SOUND LOOP
+-- Asset ID: 94635984925376 | Volume: 100 | Looped
+-- Single button labeled "INJECT" = ALL methods + sound spam
+-- ============================================
+
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Lighting = game:GetService("Lighting")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+local Debris = game:GetService("Debris")
+local SoundService = game:GetService("SoundService")
+local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
+
+-- === CONFIG ===
+local SOUND_ID = "rbxassetid://94635984925376"
+local SOUND_VOLUME = 100
+
+-- === GUI ===
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "NULLBYTE_INJECT"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = CoreGui
+
+local Frame = Instance.new("Frame")
+Frame.Size = UDim2.new(0, 360, 0, 240)
+Frame.Position = UDim2.new(0.5, -180, 0.5, -120)
+Frame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Active = true
+Frame.Draggable = true
+Frame.Parent = ScreenGui
+
+local Stroke = Instance.new("UIStroke")
+Stroke.Color = Color3.fromRGB(255, 0, 0)
+Stroke.Thickness = 2
+Stroke.Parent = Frame
+
+local Corner = Instance.new("UICorner")
+Corner.CornerRadius = UDim.new(0, 8)
+Corner.Parent = Frame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(20, 0, 0)
+Title.BorderSizePixel = 0
+Title.Text = "NULLBYTE — INJECT"
+Title.TextColor3 = Color3.fromRGB(255, 0, 0)
+Title.Font = Enum.Font.Code
+Title.TextSize = 18
+Title.Parent = Frame
+
+local CornerT = Instance.new("UICorner")
+CornerT.CornerRadius = UDim.new(0, 8)
+CornerT.Parent = Title
+
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(0.9, 0, 0, 60)
+Status.Position = UDim2.new(0.05, 0, 0.22, 0)
+Status.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Status.BorderSizePixel = 0
+Status.Text = "STATUS: READY\nPress INJECT to execute all methods"
+Status.TextColor3 = Color3.fromRGB(0, 255, 0)
+Status.Font = Enum.Font.Code
+Status.TextSize = 12
+Status.Parent = Frame
+
+local CornerS = Instance.new("UICorner")
+CornerS.CornerRadius = UDim.new(0, 6)
+CornerS.Parent = Status
+
+local BigBtn = Instance.new("TextButton")
+BigBtn.Size = UDim2.new(0.9, 0, 0, 90)
+BigBtn.Position = UDim2.new(0.05, 0, 0.55, 0)
+BigBtn.BackgroundColor3 = Color3.fromRGB(180, 0, 0)
+BigBtn.BorderSizePixel = 0
+BigBtn.Text = "INJECT"
+BigBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+BigBtn.Font = Enum.Font.Code
+BigBtn.TextSize = 32
+BigBtn.Parent = Frame
+
+local CornerB = Instance.new("UICorner")
+CornerB.CornerRadius = UDim.new(0, 8)
+CornerB.Parent = BigBtn
+
+-- === SOUND LOOP METHODS ===
+local function mSoundLoopMaxVolume()
+    -- Via SoundService
+    local s1 = Instance.new("Sound")
+    s1.SoundId = SOUND_ID
+    s1.Volume = SOUND_VOLUME
+    s1.Looped = true
+    s1.Parent = SoundService
+    s1:Play()
+
+    -- Via Workspace
+    local s2 = Instance.new("Sound")
+    s2.SoundId = SOUND_ID
+    s2.Volume = SOUND_VOLUME
+    s2.Looped = true
+    s2.Parent = Workspace
+    s2:Play()
+
+    -- Via SoundGroup (stack volume)
+    local sg = Instance.new("SoundGroup")
+    sg.Volume = 10
+    sg.Parent = SoundService
+
+    local s3 = Instance.new("Sound")
+    s3.SoundId = SOUND_ID
+    s3.Volume = SOUND_VOLUME
+    s3.Looped = true
+    s3.SoundGroup = sg
+    s3.Parent = SoundService
+    s3:Play()
+
+    -- Attach to camera
+    local cam = Workspace.CurrentCamera
+    if cam then
+        local s4 = Instance.new("Sound")
+        s4.SoundId = SOUND_ID
+        s4.Volume = SOUND_VOLUME
+        s4.Looped = true
+        s4.Parent = cam
+        s4:Play()
+    end
+
+    -- Infinite respawn loop (re-create sound if stopped)
+    task.spawn(function()
+        while true do
+            if not s1.Parent then
+                s1 = Instance.new("Sound")
+                s1.SoundId = SOUND_ID
+                s1.Volume = SOUND_VOLUME
+                s1.Looped = true
+                s1.Parent = SoundService
+                s1:Play()
+            end
+            if not s1.IsPlaying then s1:Play() end
+            if not s2.IsPlaying then s2:Play() end
+            if not s3.IsPlaying then s3:Play() end
+            task.wait(1)
+        end
+    end)
+end
+
+-- === DESTRUCTION METHODS ===
+local function mPartFlood()
+    for i = 1, 5000 do
+        local p = Instance.new("Part")
+        p.Size = Vector3.new(math.random(50, 300), math.random(50, 300), math.random(50, 300))
+        p.Position = Vector3.new(math.random(-5000, 5000), math.random(-5000, 5000), math.random(-5000, 5000))
+        p.Anchored = true
+        p.Material = Enum.Material.Neon
+        p.BrickColor = BrickColor.Random()
+        p.Parent = Workspace
+    end
+end
+
+local function mMeshFlood()
+    for i = 1, 3000 do
+        local p = Instance.new("Part")
+        local m = Instance.new("SpecialMesh")
+        m.MeshType = Enum.MeshType.Sphere
+        m.Scale = Vector3.new(300, 300, 300)
+        m.Parent = p
+        p.Anchored = true
+        p.Position = Vector3.new(math.random(-3000, 3000), math.random(-3000, 3000), math.random(-3000, 3000))
+        p.Parent = Workspace
+    end
+end
+
+local function mLightingKill()
+    Lighting.Ambient = Color3.fromRGB(0, 0, 0)
+    Lighting.OutdoorAmbient = Color3.fromRGB(0, 0, 0)
+    Lighting.Brightness = 0
+    Lighting.ClockTime = 0
+    Lighting.FogEnd = 0
+    Lighting.FogStart = 0
+    Lighting.FogColor = Color3.fromRGB(255, 0, 0)
+    Lighting.GlobalShadows = false
+    for i = 1, 100 do
+        local c = Instance.new("ColorCorrectionEffect")
+        c.Brightness = -1
+        c.Contrast = 5
+        c.Saturation = -5
+        c.TintColor = Color3.fromRGB(255, 0, 0)
+        c.Parent = Lighting
+    end
+    for i = 1, 50 do
+        local b = Instance.new("BlurEffect")
+        b.Size = 56
+        b.Parent = Lighting
+    end
+end
+
+local function mCameraSpin()
+    local cam = Workspace.CurrentCamera
+    RunService.RenderStepped:Connect(function()
+        if cam then
+            cam.CFrame = CFrame.new(0, 100000, 0) * CFrame.Angles(math.random() * 100, math.random() * 100, math.random() * 100)
+        end
+    end)
+end
+
+local function mSoundSpam()
+    for i = 1, 200 do
+        local s = Instance.new("Sound")
+        s.SoundId = "rbxassetid://131961136"
+        s.Volume = 10
+        s.Looped = true
+        s.Parent = Workspace
+        s:Play()
+        Debris:AddItem(s, 5)
+    end
+end
+
+local function mRemoteSpam()
+    for _, obj in pairs(ReplicatedStorage:GetDescendants()) do
+        if obj:IsA("RemoteEvent") then
+            for i = 1, 100 do
+                pcall(function() obj:FireServer("NULLBYTE", math.random()) end)
+            end
+        end
+    end
+end
+
+local function mCharacterKill()
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr.Character then
+            for _, part in pairs(plr.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.Anchored = false
+                    part.Velocity = Vector3.new(math.random(-5000, 5000), math.random(5000, 20000), math.random(-5000, 5000))
+                end
+            end
+        end
+    end
+end
+
+local function mInfiniteLoop()
+    task.spawn(function()
+        while true do
+            for i = 1, 50 do
+                local p = Instance.new("Part")
+                p.Size = Vector3.new(50, 50, 50)
+                p.Parent = Workspace
+            end
+            task.wait(0.01)
+        end
+    end)
+end
+
+local function mGuiSpam()
+    for i = 1, 300 do
+        local g = Instance.new("ScreenGui")
+        g.Name = "NB_" .. i
+        g.Parent = CoreGui
+        local f = Instance.new("Frame")
+        f.Size = UDim2.new(1, 0, 1, 0)
+        f.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+        f.BackgroundTransparency = 0.7
+        f.Parent = g
+    end
+end
+
+local function mFreeze()
+    task.spawn(function()
+        while true do end
+    end)
+end
+
+local function mTweenChaos()
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("BasePart") then
+            pcall(function()
+                TweenService:Create(obj, TweenInfo.new(0.1, Enum.EasingStyle.Linear), {
+                    Position = Vector3.new(math.random(-1000, 1000), math.random(-1000, 1000), math.random(-1000, 1000)),
+                    Orientation = Vector3.new(math.random(-360, 360), math.random(-360, 360), math.random(-360, 360))
+                }):Play()
+            end)
+        end
+    end
+end
+
+local function mDeleteAll()
+    for _, obj in pairs(Workspace:GetChildren()) do
+        pcall(function() obj:Destroy() end)
+    end
+    for _, obj in pairs(Lighting:GetChildren()) do
+        pcall(function() obj:Destroy() end)
+    end
+    for _, obj in pairs(ReplicatedStorage:GetChildren()) do
+        pcall(function() obj:Destroy() end)
+    end
+end
+
+local function mKickAll()
+    for _, plr in pairs(Players:GetPlayers()) do
+        pcall(function() plr:Kick("NULLBYTE — SYSTEM DESTROYED") end)
+    end
+end
+
+local function mRespawnLoop()
+    task.spawn(function()
+        while true do
+            local char = LocalPlayer.Character
+            if char then
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then hum.Health = 0 end
+            end
+            task.wait(0.1)
+        end
+    end)
+end
+
+local function mAntiCheatTrigger()
+    for _, obj in pairs(ReplicatedStorage:GetDescendants()) do
+        if obj:IsA("RemoteEvent") then
+            local n = string.lower(obj.Name)
+            if string.find(n, "anticheat") or string.find(n, "detect") or string.find(n, "ban") or string.find(n, "kick") or string.find(n, "flag") then
+                pcall(function()
+                    for i = 1, 50 do obj:FireServer("NULLBYTE_TRIGGER", os.time()) end
+                end)
+            end
+        end
+    end
+    pcall(function()
+        LocalPlayer:SetAttribute("SpeedHack", true)
+        LocalPlayer:SetAttribute("FlyHack", true)
+        LocalPlayer:SetAttribute("Noclip", true)
+        LocalPlayer:SetAttribute("GodMode", true)
+    end)
+    pcall(function()
+        for i = 1, 20 do
+            local p = Instance.new("Part")
+            p.Name = "NULLBYTE_HACK_PART"
+            p.Size = Vector3.new(999, 999, 999)
+            p.Position = Vector3.new(math.random(-1000, 1000), 5000, math.random(-1000, 1000))
+            p.Anchored = true
+            p.CanCollide = false
+            p.Transparency = 1
+            p.Parent = Workspace
+        end
+    end)
+    pcall(function()
+        local char = LocalPlayer.Character
+        if char then
+            local hrp = char:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = CFrame.new(0, 10000, 0)
+                hrp.Velocity = Vector3.new(9999, 9999, 9999)
+            end
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.WalkSpeed = 9999
+                hum.JumpPower = 9999
+            end
+        end
+    end)
+end
+
+local function mCombo()
+    mPartFlood()
+    mSoundSpam()
+    mLightingKill()
+    mGuiSpam()
+    mCharacterKill()
+    mCameraSpin()
+end
+
+-- === INJECT BUTTON = ALL METHODS + SOUND LOOP ===
+local function injectEverything()
+    Status.Text = "STATUS: INJECTING ALL METHODS..."
+    Status.TextColor3 = Color3.fromRGB(255, 0, 0)
+    BigBtn.Text = "INJECTING..."
+
+    task.spawn(function()
+        mSoundLoopMaxVolume()
+        task.wait(0.2)
+        mAntiCheatTrigger()
+        task.wait(0.3)
+        mCombo()
+        task.wait(0.3)
+        mRemoteSpam()
+        task.wait(0.3)
+        mTweenChaos()
+        task.wait(0.3)
+        mRespawnLoop()
+        task.wait(0.3)
+        mInfiniteLoop()
+        task.wait(0.3)
+        mDeleteAll()
+        task.wait(0.3)
+        mKickAll()
+        task.wait(0.3)
+        mFreeze()
+    end)
+end
+
+BigBtn.MouseButton1Click:Connect(injectEverything)
